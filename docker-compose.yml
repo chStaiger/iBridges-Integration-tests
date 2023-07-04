@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+    irods-catalog:
+        build:
+            context: irods_catalog
+        # 5432 is exposed by default and can conflict with other postgres containers.
+        # When the metalnx-db service is no longer needed, this stanza can be removed.
+        ports:
+            - "5430:5432"
+        environment:
+            - POSTGRES_PASSWORD=testpassword
+
+    irods-catalog-provider:
+        build:
+            context: irods_catalog_provider
+        depends_on:
+            - irods-catalog
+
+    irods-client:
+        build:
+            context: irods_client
+        depends_on:
+            - irods-catalog-provider
