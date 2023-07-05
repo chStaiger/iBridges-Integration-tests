@@ -1,13 +1,15 @@
+import sys
 print("Integration tests start ...")
 summary = {}
+summary['python_version'] = sys.version
 
 try:
     from utils.json_config import JsonConfig
     from irodsConnector.manager import IrodsConnector
-    summary['Import_backend'] = "success"
+    summary['import_backend'] = "success"
 except Exception as e:
     print(repr(e))
-    summary['Import_backend'] = "fail"
+    summary['import_backend'] = "fail"
 
 print("Loading configs ...")
 ibridgesEnv = JsonConfig("/root/.ibridges/ibridges_config.json")
@@ -31,6 +33,7 @@ print("Connect with cached password:")
 try:
     ic.connect()
     print("Valid iRODS session: ", ic.session.has_valid_irods_session())
+    summary['iRODS_server_version'] = ic.session.server_version
     summary['authentication_cached_passwd'] = "success"
 except Exception as e:
     summary['authentication_cached_passwd'] = repr(e)
@@ -42,6 +45,22 @@ try:
     summary['get_home_coll'] = "success"
 except Exception as e:
     summary['get_home_coll'] = repr(e)
+
+print("Get resources")
+try:
+    summary["resources"] = [resc for resc in ic.resources]
+except Exception as e:
+    summary["resources"] = repr(e)
+
+print("Upload testdata folder")
+try:
+    coll = ic.data_op.get_collection(ic.irods_environment.config.get('irods_home', '/'+ic.zone+'/home/'+ic.username))
+    ic.data_op.upload_data("/tmp/testdata", coll, ic.default_resc, size=0, force=True)
+    uploadColl = ic.data_op.get_collection(coll.path+'/testdata')
+    print("Uploaded data objects: ", str(uploadColl.data_objects))
+    summary['upload_testdata_folder'] = "success"
+except Exception as e:
+    summary['upload_testdata_folder'] = repr(e)
 
 print("Close iBridges session")
 try:

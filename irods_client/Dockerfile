@@ -30,6 +30,8 @@ RUN mkdir -p /root/.irods
 COPY irods_environment.json /root/.irods
 RUN mkdir -p /root/.ibridges
 COPY ibridges_config.json /root/.ibridges
+RUN mkdir -p /tmp
+ADD testdata /tmp/testdata/
 
 # install python 3
 RUN apt-get update && \
