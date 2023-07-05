@@ -62,6 +62,34 @@ try:
 except Exception as e:
     summary['upload_testdata_folder'] = repr(e)
 
+print("Add metadata to collection")
+try:
+    ic.meta.add([uploadColl], 'key', 'value')
+    print(uploadColl.metadata)
+    summary['metadata_collection'] = uploadColl.metadata
+except Exception as e:
+    summary['metadata_collection'] = repr(e)
+
+print("Remove metadata")
+try:
+    ic.meta.delete([uploadColl], 'key', 'value')
+    print(uploadColl.metadata)
+    summary['delete_metadata'] = 'success'
+except Exception as e:
+    summary['delete_metadata'] = repr(e)
+
+print("Delete collection")
+try:
+    ic.data_op.delete_data(uploadColl)
+    subcolls = [c.name for c in coll.subcollections]
+    if "testdata" in subcolls:
+        summary['delete_collection'] = 'failed'
+    else:
+        summary['delete_collection'] = 'success'
+except Exception as e:
+    summary['delete_collection'] = repr(e)
+    
+
 print("Close iBridges session")
 try:
     del ic
