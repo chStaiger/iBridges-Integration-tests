@@ -23,6 +23,11 @@ To recreate the images:
 1. `docker-compose rm -f`
 2. `docker-compose up --force-recreate --build --no-deps`
 
+Clean up
+
+1. `docker image prune`
+2. `docker container prune`
+
 ## Example output:
 
 ```
