@@ -20,9 +20,8 @@ Dockerised integration tests of iBridges with iRODS
 
 To recreate the images:
 
-1. sudo docker-compose rm -f
-3. sudo docker-compose build
-4. sudo docker-compose up
+1. `docker-compose rm -f`
+2. `docker-compose up --force-recreate --build --no-deps`
 
 ## Example output:
 
