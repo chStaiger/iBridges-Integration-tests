@@ -29,6 +29,19 @@ ic.irods_env_file = irodsEnv.filepath
 ic.irods_environment = irodsEnv
 print(ic.irods_environment.config)
 
+# move cached password
+os.rename("/root/.irods/.irodsA", "/root/.irods/.irodsA_backup")
+
+print("Connect with password")
+try:
+    ic.password = "rods"
+    ic.connect()
+    print("Valid iRODS session: ", ic.session.has_valid_irods_session())
+    summary['iRODS_server_version'] = ic.session.server_version
+    summary['authentication_with_passwd'] = "success"
+except Exception as e:
+    os.rename("/root/.irods/.irodsA_backup", "/root/.irods/.irodsA")
+    summary['authentication_with_passwd'] = repr(e)
 
 print("Connect with cached password:")
 try:
