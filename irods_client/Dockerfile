@@ -41,9 +41,9 @@ RUN apt-get install -y python3 \
 	git
 
 ADD iBridges-Gui /iBridges-Gui/
-COPY integration_test.py /iBridges-Gui/integration_test.py
 COPY requirements.txt /iBridges-Gui/requirements_docker.txt
 RUN pip3 install -r /iBridges-Gui/requirements_docker.txt
+COPY integration_test.py /iBridges-Gui/integration_test.py
 
 WORKDIR /
 COPY entrypoint.sh .
