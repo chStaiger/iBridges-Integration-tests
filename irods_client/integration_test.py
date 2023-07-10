@@ -1,4 +1,5 @@
 import sys
+import os
 print("Integration tests start ...")
 summary = {}
 summary['python_version'] = sys.version
@@ -69,6 +70,15 @@ try:
     summary['metadata_collection'] = uploadColl.metadata
 except Exception as e:
     summary['metadata_collection'] = repr(e)
+
+print("Download collection")
+try:
+    ic.data_op.download_data(uploadColl, "/tmp", 0, force=True)
+    files = os.listdir("/tmp/"+uploadColl.name)
+    os.system("rm -rf /tmp/"+uploadColl.name)
+    summary['download_collecion'] = files
+except Exception as e:
+    summary['download_collecion'] = repr(e)
 
 print("Remove metadata")
 try:
