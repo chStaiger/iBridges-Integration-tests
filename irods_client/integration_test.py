@@ -1,40 +1,39 @@
 import sys
 import os
+
 print("Integration tests start ...")
 summary = {}
 summary['python_version'] = sys.version
 
 try:
-    from utils.json_config import JsonConfig
+    from utils.json_config import JSONConfig
+    from utils.context import Context
     from irodsConnector.manager import IrodsConnector
     summary['import_backend'] = "success"
 except Exception as e:
     print(repr(e))
     summary['import_backend'] = "fail"
 
-print("Loading configs ...")
-ibridgesEnv = JsonConfig("/root/.ibridges/ibridges_config.json")
-print("iBridges config:")
-print(ibridgesEnv.config)
-print()
-irodsEnv = JsonConfig("/root/.irods/irods_environment.json")
-print("iRODS config:")
-print(irodsEnv.config)
+print("Setting up context ...")
+try:
+    context = Context()
+    print("iBridges config:")
+    print(context.ibridges_configuration)
+    context.irods_env_file = "/root/.irods/irods_environment.json"
+    print("iRODS config:")
+    print(context.irods_environment)
+    summary["set_up_context"] = "success"
+except Exception as e:
+    summary["set_up_context"] = repr(e)
 
-print("Passing configs to irodsConnector ...")
 ic = IrodsConnector()
-ic.ibridges_configuration = ibridgesEnv
-print(ic.ibridges_configuration.config)
-ic.irods_env_file = irodsEnv.filepath
-ic.irods_environment = irodsEnv
-print(ic.irods_environment.config)
 
 # move cached password
 os.rename("/root/.irods/.irodsA", "/root/.irods/.irodsA_backup")
 
 print("Connect with password")
 try:
-    ic.password = "rods1"
+    ic.password = "rods"
     ic.connect()
     print("Valid iRODS session: ", ic.session.has_valid_irods_session())
     summary['iRODS_server_version'] = ic.session.server_version
@@ -55,7 +54,7 @@ except Exception as e:
 
 print("Get home collection")
 try:
-    coll = ic.data_op.get_collection(ic.irods_environment.config.get('irods_home', '/'+ic.zone+'/home/'+ic.username))
+    coll = ic.data_op.get_collection(context.irods_environment.config.get('irods_home', '/'+ic.zone+'/home/'+ic.username))
     print(coll.path)
     summary['get_home_coll'] = "success"
 except Exception as e:
@@ -69,7 +68,7 @@ except Exception as e:
 
 print("Upload testdata folder")
 try:
-    coll = ic.data_op.get_collection(ic.irods_environment.config.get('irods_home', '/'+ic.zone+'/home/'+ic.username))
+    coll = ic.data_op.get_collection(context.irods_environment.config.get('irods_home', '/'+ic.zone+'/home/'+ic.username))
     ic.data_op.upload_data("/tmp/testdata", coll, ic.default_resc, size=0, force=True)
     uploadColl = ic.data_op.get_collection(coll.path+'/testdata')
     print("Uploaded data objects: ", str(uploadColl.data_objects))
