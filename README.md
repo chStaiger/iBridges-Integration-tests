@@ -11,7 +11,7 @@ Dockerised integration tests of iBridges with iRODS
    
    ```sh
    cd iBridges-Integration-tests/irods_client/
-   git clone https://github.com/chStaiger/iBridges-Gui.git
+   git clone git clone --branch develop https://github.com/chStaiger/iBridges-Gui.git
    cd ..
    ```
 
